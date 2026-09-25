@@ -8,6 +8,7 @@
  * "research-pack" event.
  */
 import { Actor } from 'apify';
+import {log} from "crawlee"
 
 import { buildResearchPack } from './organize.js';
 
@@ -28,19 +29,18 @@ await Actor.init();
 // await Actor.exit()
 
 
-const {
-    topic,
-    maxResults = 10,
-} = (await Actor.getInput()) ?? {};
+// const {
+//     topic,
+//     maxResults = 10,
+// } = (await Actor.getInput()) ?? {};
 
-console.log(topic)
 
-if (!topic || typeof topic !== 'string' || !topic.trim()) {
-    throw new Error('A non-empty "topic" input is required, e.g. { "topic": "The Benin Kingdom" }.');
-}
+const input = await Actor.getInput();
+const topic = input?.topic;
+const maxResults = input?.maxResults ?? 10;
 
-const cleanTopic = topic.trim();
-Actor.log.info(`Starting research for topic: "${cleanTopic}"`);
+
+log.info(`Starting research for topic: "${cleanTopic}"`);
 
 // Collect public web sources. `queries` must be an array for this actor.
 const searchInput = {
@@ -54,11 +54,11 @@ let organicResults = [];
 // When running locally with `apify run`, calling another actor requires the
 // APIFY_TOKEN environment variable (set in .env or the shell).
 try {
-    Actor.log.info('Running Google Search Scraper actor...');
+    log.info('Running Google Search Scraper actor...');
     const run = await Actor.call(SEARCH_ACTOR_ID, searchInput, { memoryMbytes: 1024 });
     const { items } = await Actor.getDataSet(run.defaultDatasetId);
     organicResults = items[0]?.organicResults ?? [];
-    Actor.log.info(`Retrieved ${organicResults.length} raw results.`);
+    log.info(`Retrieved ${organicResults.length} raw results.`);
 } catch (err) {
     Actor.log.error(`Failed to collect sources: ${err.message}`);
     throw new Error(
@@ -79,10 +79,10 @@ const researchPack = buildResearchPack(cleanTopic, organicResults);
 const chargeResult = await Actor.pushData(researchPack, RESEARCH_PACK_EVENT);
 
 if (chargeResult?.eventChargeLimitReached) {
-    Actor.log.info('User spending limit reached — finishing the run.');
+    log.info('User spending limit reached — finishing the run.');
 }
 
-Actor.log.info(`Research pack for "${cleanTopic}" delivered. Done.`);
+log.info(`Research pack for "${cleanTopic}" delivered. Done.`);
 
 // Gracefully exit the Actor process.
 await Actor.exit();
