@@ -13,3 +13,6 @@ storage
 # secrets — never commit
 .env
 .env.*
+
+
+HACKATHON_QA.md 
