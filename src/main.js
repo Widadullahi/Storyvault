@@ -39,6 +39,7 @@ const input = await Actor.getInput();
 const topic = input?.topic;
 const maxResults = input?.maxResults ?? 10;
 
+const cleanTopic = topic?.trim();
 
 log.info(`Starting research for topic: "${cleanTopic}"`);
 
