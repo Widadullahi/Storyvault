@@ -6,7 +6,8 @@
     "description": "Collects public web sources on any African historical or cultural topic and organizes them into a structured, source-linked research pack: overview, timeline, entities, sources and verification notes.",
     "version": "1.0.0",
     "meta": {
-        "templateId": "js-crawlee-cheerio"
+        "templateId": "js-crawlee-cheerio",
+        "generatedBy": "Freebuff with z-ai/glm-5.3-flash"
     },
     "inputSchema": "./input_schema.json",
     "outputSchema": "./output_schema.json",

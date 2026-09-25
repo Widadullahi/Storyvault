@@ -7,10 +7,10 @@
  * every research pack delivered to the dataset is charged via the
  * "research-pack" event.
  */
-import { Actor } from 'apify';
-import {log} from "crawlee"
+import { Actor, log } from 'apify';
 
 import { buildResearchPack } from './organize.js';
+import { fetchDuckDuckGoResults } from './search.js';
 
 // Constants used across the actor.
 const SEARCH_ACTOR_ID = 'apify/google-search-scraper';
@@ -41,6 +41,11 @@ const maxResults = input?.maxResults ?? 10;
 
 const cleanTopic = topic?.trim();
 
+if (!cleanTopic) {
+    log.error('Input must include a non-empty "topic" string.');
+    await Actor.exit({ statusMessage: 'Missing required input: topic' });
+}
+
 log.info(`Starting research for topic: "${cleanTopic}"`);
 
 // Collect public web sources. `queries` must be an array for this actor.
@@ -52,23 +57,32 @@ const searchInput = {
 
 let organicResults = [];
 
-// When running locally with `apify run`, calling another actor requires the
-// APIFY_TOKEN environment variable (set in .env or the shell).
+// Preferred source: the paid Google Search Scraper actor. When it is not
+// available (e.g. the account cannot be charged for it), fall back to a free
+// DuckDuckGo HTML search so the run is not blocked.
 try {
     log.info('Running Google Search Scraper actor...');
-    const run = await Actor.call(SEARCH_ACTOR_ID, searchInput, { memoryMbytes: 1024 });
+    const run = await Actor.call(SEARCH_ACTOR_ID, searchInput);
     const { items } = await Actor.getDataSet(run.defaultDatasetId);
     organicResults = items[0]?.organicResults ?? [];
-    log.info(`Retrieved ${organicResults.length} raw results.`);
-} catch (err) {
-    Actor.log.error(`Failed to collect sources: ${err.message}`);
-    throw new Error(
-        'Could not collect public sources. Ensure APIFY_TOKEN is set when running locally, and that the run budget allows calling the Google Search Scraper actor.',
+    log.info(`Retrieved ${organicResults.length} raw results from Google.`);
+} catch (googleError) {
+    log.warning(
+        `Google Search Scraper unavailable (${googleError.message}). Falling back to free DuckDuckGo search.`,
     );
+    try {
+        organicResults = await fetchDuckDuckGoResults(cleanTopic, Math.min(Math.max(maxResults, 1), 20));
+        log.info(`Retrieved ${organicResults.length} raw results from DuckDuckGo.`);
+    } catch (ddgError) {
+        log.error(`DuckDuckGo fallback failed: ${ddgError.message}`);
+        throw new Error(
+            'Could not collect public sources: both the Google Search Scraper actor and the DuckDuckGo fallback failed.',
+        );
+    }
 }
 
 if (organicResults.length === 0) {
-    Actor.log.warning('No organic results found for this topic — pushing an empty research pack.');
+    log.warning('No organic results found for this topic — pushing an empty research pack.');
 }
 
 // Organize the raw results into the research pack structure.
