@@ -7,7 +7,7 @@
  * every research pack delivered to the dataset is charged via the
  * "research-pack" event.
  */
-import { Actor, log } from 'apify';
+import { Actor, Configuration, log } from 'apify';
 
 import { buildResearchPack } from './organize.js';
 import { fetchDuckDuckGoResults } from './search.js';
@@ -15,6 +15,12 @@ import { fetchDuckDuckGoResults } from './search.js';
 // Constants used across the actor.
 const SEARCH_ACTOR_ID = 'apify/google-search-scraper';
 const RESEARCH_PACK_EVENT = 'research-pack';
+
+// Keep previous runs' results: with the default purgeOnStart=true the local
+// dataset is emptied at every start, so a new run would overwrite the previous
+// research pack instead of appending a new dataset item. On the Apify platform
+// this setting has no effect (storage is per-run there anyway).
+Configuration.getGlobalConfig().set('purgeOnStart', false);
 
 // The init() call configures the Actor to work with the Apify platform storage.
 await Actor.init();
