@@ -1,15 +1,24 @@
 {
-  "title": "StoryVault Africa Input",
-  "type": "object",
-  "schemaVersion": 1,
-  "properties": {
-    "prompt": {
-      "title": "Story Prompt",
-      "type": "string",
-      "description": "Enter the prompt or theme for the African story/narration.",
-      "editor": "textarea",
-      "prefill": "A story about a young girl in the ancient Oyo Empire."
-    }
-  },
-  "required": ["prompt"]
+    "$schema": "https://apify.com/schemas/v1/input.ide.json",
+    "title": "StoryVault Africa Input",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "topic": {
+            "title": "Research topic",
+            "type": "string",
+            "description": "The African historical or cultural topic to research. Example: 'The Benin Kingdom', 'Queen Amina of Zazzau', 'The Nok Civilization'.",
+            "editor": "textarea",
+            "prefill": "The Benin Kingdom"
+        },
+        "maxResults": {
+            "title": "Max sources",
+            "type": "integer",
+            "description": "Maximum number of public web sources to collect and organize.",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 20
+        }
+    },
+    "required": ["topic"]
 }

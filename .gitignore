@@ -1,4 +1,15 @@
-node_modules/
-**/node_modules/
+# This file tells Git which files shouldn't be added to source control
+
+.DS_Store
+.idea
+.vscode
+.zed
+dist
+node_modules
+apify_storage
+crawlee_storage
+storage
+
+# secrets — never commit
 .env
-**/.env
+.env.*

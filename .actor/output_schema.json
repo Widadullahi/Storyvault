@@ -1,12 +1,12 @@
 {
-  "actorOutputSchemaVersion": 1,
-  "title": "StoryVault Africa Output",
-  "type": "object",
-  "properties": {
-    "story": {
-      "title": "Generated Story",
-      "type": "string",
-      "template": "{{linksTo self}}"
+    "$schema": "https://apify.com/schemas/v1/output.ide.json",
+    "actorOutputSchemaVersion": 1,
+    "title": "StoryVault Africa Output",
+    "properties": {
+        "results": {
+            "type": "string",
+            "title": "Research packs",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
     }
-  }
 }

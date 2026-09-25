@@ -1,0 +1,29 @@
+{
+    "$schema": "https://apify.com/schemas/v1/dataset.ide.json",
+    "actorSpecification": 1,
+    "fields": {
+        "topic": { "type": "string", "title": "Topic" },
+        "overview": { "type": "string", "title": "Overview" },
+        "timeline": { "type": "array", "title": "Timeline" },
+        "entities": { "type": "array", "title": "Entities" },
+        "sources": { "type": "array", "title": "Sources" },
+        "verificationNotes": { "type": "array", "title": "Verification notes" },
+        "generatedAt": { "type": "string", "title": "Generated at" }
+    },
+    "views": {
+        "overview": {
+            "title": "Research pack",
+            "transformation": {
+                "fields": ["topic", "overview", "generatedAt"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "topic": { "label": "Topic", "format": "text" },
+                    "overview": { "label": "Overview", "format": "text" },
+                    "generatedAt": { "label": "Generated at", "format": "text" }
+                }
+            }
+        }
+    }
+}
